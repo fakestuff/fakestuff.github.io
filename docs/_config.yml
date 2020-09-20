@@ -23,7 +23,7 @@ email: leon.jun93@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   引擎程序随笔
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://fakestuff.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  315242904@qq.com
 

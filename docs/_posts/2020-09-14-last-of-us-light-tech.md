@@ -10,7 +10,7 @@ sh lightmap
 ambient+lightmap per texel
 
 Lightmap 接缝漏光问题
-![Lightmap Seams](/_assets/images/TLOS/gen1-lightmapSeams.png)
+![Lightmap Seams]({{site.url}}/_assets/images/TLOS/gen1-lightmapSeams.png)
 
 
 # 最后生还者2
