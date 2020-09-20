@@ -10,4 +10,4 @@ sh lightmap
 ambient+lightmap per texel
 
 Lightmap Leak Issue
-![Lightmap Leak Issue](_assets/images/TLOS/gen1-lightmapSeams.png)
+![Lightmap Leak Issue](../_assets/images/TLOS/gen1-lightmapSeams.png)
