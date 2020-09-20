@@ -1,7 +1,13 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
-date:   2020-09-14 15:13:54 +0800
+title:  "last of us light tech"
+date:   2020-09-14 16:13:54 +0800
 categories: jekyll update
 ---
-drafts
+
+half life2 basics
+sh lightmap
+ambient+lightmap per texel
+
+Lightmap Leak Issue
+![Lightmap Leak Issue](_assets/images/TLOS/gen1-lightmapSeams.png)
