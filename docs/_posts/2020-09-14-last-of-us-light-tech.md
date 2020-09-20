@@ -9,8 +9,10 @@ half life2 basics
 sh lightmap
 ambient+lightmap per texel
 
-Lightmap 接缝漏光问题
-![Lightmap Seams]({{site.url}}/_assets/images/TLOS/gen1-lightmapSeams.png)
+Lightmap存在接缝漏光问题
+
+![Lightmap Seams](/assets/images/TLOS/gen1-lightmapSeams.png)
+
 
 
 # 最后生还者2
