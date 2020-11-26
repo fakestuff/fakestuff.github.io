@@ -1,0 +1,115 @@
+I"� <h2 id="intro">Intro</h2>
+<p>For short, I am alwyas confused about the row-column major of graphics API.
+Especially when it comes to vulkan, with new NDC, and HLSL which is designed for DX though it’s ‘native’ shading language now.
+So I deceide to make it clear and write down this article.</p>
+
+<h2 id="first-attempt">First Attempt</h2>
+<p>After try out bunch of permutation, the following code works.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">// DXMATH MATRIX SHOULD BE ROW MAJOR</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">Matrix</span><span class="o">::</span><span class="n">CreateRotationY</span><span class="p">(</span><span class="n">time</span><span class="p">);</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">Matrix</span><span class="o">::</span><span class="n">CreateLookAt</span><span class="p">(</span><span class="n">float3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">float3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">float3</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">));</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">ubo</span><span class="p">.</span><span class="n">view</span><span class="p">;</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">Matrix</span><span class="o">::</span><span class="n">CreatePerspectiveFieldOfView</span><span class="p">(</span><span class="mf">3.14</span><span class="n">f</span> <span class="o">/</span> <span class="mf">2.0</span><span class="n">f</span><span class="p">,</span> <span class="n">m_swapChainExtent</span><span class="p">.</span><span class="n">width</span> <span class="o">/</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="n">m_swapChainExtent</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="mf">0.01</span><span class="n">f</span><span class="p">,</span> <span class="mf">1000.0</span><span class="n">f</span><span class="p">);</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">proj</span><span class="p">.</span><span class="n">_22</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">ubo</span><span class="p">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">ubo</span><span class="p">.</span><span class="n">proj</span><span class="p">;</span>
+
+
+<span class="n">VSOutput</span> <span class="nf">main</span><span class="p">(</span><span class="n">VSInput</span> <span class="n">input</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">VSOutput</span> <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">VSOutput</span><span class="p">)</span><span class="mi">0</span><span class="p">;</span>
+	<span class="n">output</span><span class="p">.</span><span class="n">Color</span> <span class="o">=</span> <span class="n">input</span><span class="p">.</span><span class="n">Color</span><span class="p">;</span>
+    <span class="c1">// but the multiply style is more like column major</span>
+    <span class="n">float4</span> <span class="n">pos</span> <span class="o">=</span>  <span class="n">mul</span><span class="p">(</span><span class="n">ubo</span><span class="p">.</span><span class="n">proj</span><span class="p">,</span> <span class="n">mul</span><span class="p">(</span><span class="n">ubo</span><span class="p">.</span><span class="n">view</span><span class="p">,</span> <span class="p">(</span><span class="n">mul</span><span class="p">(</span><span class="n">ubo</span><span class="p">.</span><span class="n">model</span><span class="p">,</span> <span class="n">float4</span><span class="p">(</span><span class="n">input</span><span class="p">.</span><span class="n">Pos</span><span class="p">.</span><span class="n">xyz</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)))));</span>
+    <span class="n">output</span><span class="p">.</span><span class="n">Pos</span> <span class="o">=</span>  <span class="n">pos</span><span class="p">;</span>
+	<span class="k">return</span> <span class="n">output</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>But this is a little bit wierd for me, since the matrix should be row major, while the hlsl multiply is column major style.</p>
+
+<h2 id="column-major-and-row-major">Column Major and Row Major</h2>
+<p><a href="https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/geometry/row-major-vs-column-major-vector">scratchapixel reference</a></p>
+
+<p>DXMATH: ROW MAJOR</p>
+
+<p>GLM: COL MAJOR</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Row Major : V = [x y z]
+
+                  x
+Col Major : V = [ y ]
+                  z
+</code></pre></div></div>
+
+<p>Row Major: Left or pre-multiplication P/V * M or (P *  S * R * T)
+Column Major: Right or post-multiplication M * P/V or (T * R * S * P)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>           a b c
+[x y z] * [d e f] = [x' y' z']
+           g h i
+
+x' = x * a + y * d + z * g
+y' = x * b + y * e + z * h
+z' = x * c + y * f + z * i
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> a b c
+[d e f] = [x' y' z']
+ g h i
+
+x' = x * a + y * d + z * g
+y' = x * b + y * e + z * h
+z' = x * c + y * f + z * i
+
+</code></pre></div></div>
+
+<h2 id="compiler">COMPILER</h2>
+<p>From <a href="antiagainst.github.io/post/hlsl-for-vulkan-matrices/">hlsl-for-vulkan-matrices</a>
+When translate HLSL to SPIR_V</p>
+
+<blockquote>
+  <h3 id="majorness">Majorness</h3>
+  <p>As said previously, majorness only matters for externally initialized matrices. This agrees with SPIR-V validation rules, which requires matrices inside shader resources to be explicitly laid out, but not the shader internal ones (inside Function or Private storage class).</p>
+</blockquote>
+
+<blockquote>
+  <h3 id="float-matrices">Float matrices</h3>
+  <p>But as we need to swap the multiplication operands, we also need to flip the majorness decoration in SPIR-V to make sure matrices are initialized in the transposed manner:</p>
+
+  <p>HLSL row_major should be translated into SPIR-V ColMajor;
+HLSL column_major should be translated into SPIR-V RowMajor.</p>
+</blockquote>
+
+<p>After reading this I start to understand why this happened.
+The Matrix set from cpu is row major, but when doing the calculating, the compiler transpose it to col major, thus my right multiply works.</p>
+
+<p>There are two ways to fix it, adding the decorator before matrix</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct UBO
+{
+	row_major float4x4 model;
+	row_major float4x4 view;
+	row_major float4x4 proj;
+};
+cbuffer ubo : register(b0) { UBO ubo; }
+
+VSOutput main(VSInput input)
+{
+	VSOutput output = (VSOutput)0;
+	output.Color = input.Color;
+    float4 pos =  mul(mul(mul(float4(input.Pos.xyz, 1.0), ubo.model),ubo.view),ubo.proj); // row major
+    output.Pos =  pos;
+	return output;
+}
+// https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst
+</code></pre></div></div>
+
+<p>or using the compile cmd -Zpc/-Zpr</p>
+
+<p>second somehow not work for me for now. So I decided to stick with row major in my shader as long as make it consitent with PBRT.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>That’s it. Just some anti intuition setup from compiler.</p>
+:ET

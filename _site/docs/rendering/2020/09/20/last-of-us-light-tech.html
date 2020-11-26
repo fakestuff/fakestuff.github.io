@@ -1,0 +1,50 @@
+<h1 id="最后生还者1">最后生还者1</h1>
+
+<p>Lightmap存在接缝漏光/相差较大的问题问题</p>
+
+<p><img src="/assets/images/TLOS/gen1-lightmapSeams.png" alt="Lightmap Seams" />
+使用最小方差去使Error function的值最小，输入值为每个图素的值</p>
+
+<p>使用的Eigen 别去自己实现solver
+<img src="/assets/images/TLOS/gen1-lmErrorFun.png" alt="Minimun Square" /></p>
+
+<p>想要避免过平的间接光，当时已有以下几种方案</p>
+<ul>
+  <li>half life2 basics</li>
+  <li>sh lightmap</li>
+  <li>ambient+lightmap per texel</li>
+</ul>
+
+<p>最后选择了环境光+方向的方案(rgb,dir,rgb)
+美术可以手调，使用烘焙工具生成了SH lightmap再生成最终结果</p>
+
+<p>C_Indir = C_Ambient + Dot(N,C_IndirLDir)*C_IndirLCol</p>
+
+<p>![Indirect No Shadow]</p>
+
+<p>![Indirect Shadow]</p>
+
+<p>![Direction Extraction]</p>
+
+<p>需要一个可见性函数来表达受阴影程度。使用球体（允许非等比缩放来拟合胶囊体）来近似遮蔽物。</p>
+
+<p>对于环境光项，可以把它看成一个cos weight函数。
+对于方向光，使用cone trace。
+![Shadow Approximiate]</p>
+
+<p>环境光项是closed form,可以直接算。
+方向光直接算有点麻烦，是用的蒙特卡洛算了以后烘焙到LUT上
+phi:方向光和与遮蔽体形成的圆锥的主轴的夹角。
+theta:被遮蔽的角度</p>
+
+<p>![shadow lut]
+![shadow result]
+在spu上完成计算。渲染主导光到offscreen rt上
+将屏幕分成小tile, 每个tile算出可能潜在相交的occluder</p>
+
+<p>http://miciwan.com/SIGGRAPH2013/Lighting%20Technology%20of%20The%20Last%20Of%20Us.pdf</p>
+
+<p>![Ambient Plus dir]</p>
+
+<h1 id="最后生还者2">最后生还者2</h1>
+
